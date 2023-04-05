@@ -1,4 +1,5 @@
 import tkinter as tk
+from main import *
 
 # Primary Window
 root = tk.Tk()
@@ -19,35 +20,39 @@ root.title("PyCalculator")
 root.iconbitmap("icon.ico")
 root.resizable(False, False)
 
+# Buffers
+buffer_min_view = ""
+buffer_view = "0"
+
 # Widgets
 frame = tk.Label(root, text="PyCalculator  -  By EcWolf",bg=DARK, font=FONT, fg=LIGHT, width="28", height="1")
-min_view = tk.Label(root, text="0", font=FONT, fg=LIGHT, bg=DARK, width="7", height="2")
-view = tk.Label(root, text="0", font=UPPER_FONT, fg=LIGHT, bg=DARK, width="7", height="3")
+min_view = tk.Label(root, text="", font=FONT, fg=LIGHT, bg=DARK, width="31", height="2")
+view = tk.Label(root, text="0", font=UPPER_FONT, fg=LIGHT, bg=DARK, width="21", height="3")
 
-b_undo = tk.Button(root, text="<<", font=FONT, fg=LIGHT, bg=SPECIAL_BG, width="7", height="3")
-b_clean = tk.Button(root, text="CLR", font=FONT, fg=LIGHT, bg=SPECIAL_BG, width="7", height="3")
-b_multiply = tk.Button(root, text="X", font=FONT, fg=LIGHT, bg=SPECIAL_BG, width="7", height="3")
-b_split = tk.Button(root, text="%", font=FONT, fg=LIGHT, bg=SPECIAL_BG, width="7", height="3")
-b_add = tk.Button(root, text="+", font=FONT, fg=LIGHT, bg=SPECIAL_BG, width="7", height="3")
-b_subtract = tk.Button(root, text="-", font=FONT, fg=LIGHT, bg=SPECIAL_BG, width="7", height="3")
-b_equal = tk.Button(root, text="=", font=FONT, fg=LIGHT, bg=SPECIAL_BG, width="7", height="7")
-b_deny = tk.Button(root, text="+/-", font=FONT, fg=LIGHT, bg=SPECIAL_BG, width="7", height="3")
-b_point = tk.Button(root, text=",", font=FONT, fg=LIGHT, bg=SPECIAL_BG, width="7", height="3")
-b0 = tk.Button(root, text="0", font=FONT, fg=LIGHT, bg=SWITCH_BG, width="7", height="3")
-b1 = tk.Button(root, text="1", font=FONT, fg=LIGHT, bg=SWITCH_BG, width="7", height="3")
-b2 = tk.Button(root, text="2", font=FONT, fg=LIGHT, bg=SWITCH_BG, width="7", height="3")
-b3 = tk.Button(root, text="3", font=FONT, fg=LIGHT, bg=SWITCH_BG, width="7", height="3")
-b4 = tk.Button(root, text="4", font=FONT, fg=LIGHT, bg=SWITCH_BG, width="7", height="3")
-b5 = tk.Button(root, text="5", font=FONT, fg=LIGHT, bg=SWITCH_BG, width="7", height="3")
-b6 = tk.Button(root, text="6", font=FONT, fg=LIGHT, bg=SWITCH_BG, width="7", height="3")
-b7 = tk.Button(root, text="7", font=FONT, fg=LIGHT, bg=SWITCH_BG, width="7", height="3")
-b8 = tk.Button(root, text="8", font=FONT, fg=LIGHT, bg=SWITCH_BG, width="7", height="3")
-b9 = tk.Button(root, text="9", font=FONT, fg=LIGHT, bg=SWITCH_BG, width="7", height="3")
+b_undo = tk.Button(root, text="<<", font=FONT, fg=LIGHT, bg=SPECIAL_BG, width="7", height="3", command=bUndo)
+b_clean = tk.Button(root, text="CLR", font=FONT, fg=LIGHT, bg=SPECIAL_BG, width="7", height="3", command=bClean)
+b_multiply = tk.Button(root, text="X", font=FONT, fg=LIGHT, bg=SPECIAL_BG, width="7", height="3", command=bMultiply)
+b_split = tk.Button(root, text="%", font=FONT, fg=LIGHT, bg=SPECIAL_BG, width="7", height="3", command=bSplit)
+b_add = tk.Button(root, text="+", font=FONT, fg=LIGHT, bg=SPECIAL_BG, width="7", height="3", command=bAdd)
+b_subtract = tk.Button(root, text="-", font=FONT, fg=LIGHT, bg=SPECIAL_BG, width="7", height="3", command=bSubtact)
+b_equal = tk.Button(root, text="=", font=FONT, fg=LIGHT, bg=SPECIAL_BG, width="7", height="7", command=bEqual)
+b_deny = tk.Button(root, text="+/-", font=FONT, fg=LIGHT, bg=SPECIAL_BG, width="7", height="3", command=bDeny)
+b_point = tk.Button(root, text=",", font=FONT, fg=LIGHT, bg=SPECIAL_BG, width="7", height="3", command=bPoint)
+b0 = tk.Button(root, text="0", font=FONT, fg=LIGHT, bg=SWITCH_BG, width="7", height="3", command=b0)
+b1 = tk.Button(root, text="1", font=FONT, fg=LIGHT, bg=SWITCH_BG, width="7", height="3", command=b1)
+b2 = tk.Button(root, text="2", font=FONT, fg=LIGHT, bg=SWITCH_BG, width="7", height="3", command=b2)
+b3 = tk.Button(root, text="3", font=FONT, fg=LIGHT, bg=SWITCH_BG, width="7", height="3", command=b3)
+b4 = tk.Button(root, text="4", font=FONT, fg=LIGHT, bg=SWITCH_BG, width="7", height="3", command=b4)
+b5 = tk.Button(root, text="5", font=FONT, fg=LIGHT, bg=SWITCH_BG, width="7", height="3", command=b5)
+b6 = tk.Button(root, text="6", font=FONT, fg=LIGHT, bg=SWITCH_BG, width="7", height="3", command=b6)
+b7 = tk.Button(root, text="7", font=FONT, fg=LIGHT, bg=SWITCH_BG, width="7", height="3", command=b7)
+b8 = tk.Button(root, text="8", font=FONT, fg=LIGHT, bg=SWITCH_BG, width="7", height="3", command=b8)
+b9 = tk.Button(root, text="9", font=FONT, fg=LIGHT, bg=SWITCH_BG, width="7", height="3", command=b9)
 
 # Positions
 frame.grid(row=0, column= 0, columnspan=4, sticky="nw")
-min_view.grid(row=1, column= 0, columnspan=4, sticky="e")
-view.grid(row=2, column= 0, columnspan=4, sticky="e")
+min_view.grid(row=1, column= 0, columnspan=4, sticky="w")
+view.grid(row=2, column= 0, columnspan=4, sticky="w")
 
 b_split.grid(row=3, column=0, padx=0, pady=0)
 b_multiply.grid(row=3, column=1, padx=0, pady=0)
