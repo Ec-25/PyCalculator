@@ -16,23 +16,20 @@ def concatCheck(label: str) -> bool:
     return True
 
 
-def renderingMinView():
-    """
-    Controls how information will be displayed in the minimal view
-    """
-    MAX_LENGTH = 31
-    return
-
-
-
-def renderingView(label: str) -> tuple[str, str]:
+def rendering(label: str, general:bool = True) -> tuple[str, str]:
     """
     Controls how the information will be displayed in the view
+    General = True: MAX_LENGTH = 21 for View
+    General = False: MAX_LENGTH = 31 for MinView
     """
-    MAX_LENGTH = 21
+    if general:
+        MAX_LENGTH = 21
+    else:
+        MAX_LENGTH = 31
 
-    if len(label) > 21:
+    if len(label) > MAX_LENGTH:
         text = ""
+        # All the numbers remain in the buffer, and only the last 21 digits are shown
         for i in range(MAX_LENGTH):
             if len(text) == 0:
                 text = label[-1-(i)]
@@ -52,14 +49,14 @@ def bNumn(num: str) -> None:
     newText = ""
 
     # if it is equal to zero, it is replaced by the income
-    if view == "0" and num != ",":
+    if view == "0" and num != ".":
         newText = num
 
     # check that only one comma can be placed
-    elif num == ",":
+    elif num == ".":
         exists = False
         for c in range(len(view)):
-            if view[c] == ",":
+            if view[c] == ".":
                 exists = True
 
         if not exists:
@@ -72,12 +69,10 @@ def bNumn(num: str) -> None:
     else:
         newText = view + num
 
-    print(newText)
     # is displayed on screen
-    text, buffer = renderingView(newText)
+    text, buffer = rendering(newText)
     gui.view.config(text=text)
     gui.buffer_view = buffer
-    return
 
 
 def b0():
@@ -121,22 +116,86 @@ def b9():
 
 
 def bPoint():
-    bNumn(",")
+    bNumn(".")
 
 
 def bDeny():
+    # get buffer of view
+    view = gui.buffer_view
 
-    return
+    # If the number is negative, remove the sign
+    if view[0] == "-":
+        view = view[1:]
+
+    # otherwise, the negative sign is added
+    else:
+        view = "-" + view
+
+    # the buffer is saved again and set as shown
+    gui.buffer_view = view
+
+    text, buffer = rendering(view)
+    gui.view.config(text=text)
+    gui.buffer_view = buffer
 
 
 def bEqual():
+    bView = gui.buffer_view
+    # if bView != "0":
 
-    return
 
 
 def bAdd():
+    # get buffer of view and buffer of min_view
+    bView = gui.buffer_view
+    bMin_view = gui.buffer_min_view
 
-    return
+    exists = False
+    for i in range(len(bMin_view)):
+        if bMin_view[i] == "+":
+            exists = True
+
+    # If the min view already has the symbol, add it and put the symbol back, if not, just put the number and the operation
+    if exists:
+        if bView != "0" and bMin_view != "0":
+            bView = float(bView)
+            bMin_view = float(bMin_view[:-1])
+            result = bMin_view + bView
+
+        elif bView != "0" and bMin_view == "0":
+            bView = float(bView)
+            bMin_view = int(bMin_view)
+            result = bMin_view + bView
+
+        else:
+            # if you have not yet indicated a value, do nothing
+            return
+        if str(result)[-2:] == ".0":
+            result = str(result)[:-2]
+            result = int(result)
+
+        result = round(result, 2)
+        result = str(result) + "+"
+    
+    else:
+        bView = float(bView)
+        bMin_view = int(bMin_view)
+        result = bMin_view + bView
+
+        if str(result)[-2:] == ".0":
+            result = str(result)[:-2]
+            result = int(result)
+
+        result = round(result, 2)
+        result = str(result) + "+"
+
+    # update views and buffers
+    gui.buffer_view = "0"
+    gui.view.config(text="0")
+
+    text, buffer = rendering(str(result), False)
+    gui.buffer_min_view = buffer
+    gui.min_view.config(text=text)
 
 
 def bSubtact():
@@ -155,13 +214,19 @@ def bSplit():
 
 
 def bClean():
-
-    return
+    # set all view labels to 0
+    if gui.buffer_view == "0":
+        gui.buffer_min_view = "0"
+        gui.min_view.config(text="")
+    gui.buffer_view = "0"
+    gui.view.config(text="0")
 
 
 def bUndo():
-
-    return
+    # removes the last element from the view tag
+    gui.buffer_view = gui.buffer_view[:-1]
+    text:str = gui.view.cget("text")
+    gui.view.config(text=text[:-1])
 
 
 if __name__ == '__main__':

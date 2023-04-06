@@ -21,7 +21,7 @@ root.iconbitmap("icon.ico")
 root.resizable(False, False)
 
 # Buffers
-buffer_min_view = ""
+buffer_min_view = "0"
 buffer_view = "0"
 
 # Widgets
