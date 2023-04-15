@@ -1,12 +1,7 @@
 import gui
 
 
-def action():
-    print("ACTION")
-    return
-
-
-def updateViews(minView:str):
+def updateViews(minView: str):
     # update views and buffers
     gui.buffer_view = "0"
     gui.view.config(text="0")
@@ -14,7 +9,7 @@ def updateViews(minView:str):
     updateMinView(minView)
 
 
-def updateMinView(minView:str):
+def updateMinView(minView: str):
     # update only min view
     text, buffer = rendering(minView, False)
     gui.buffer_min_view = buffer
@@ -31,7 +26,7 @@ def concatCheck(label: str) -> bool:
     return True
 
 
-def rendering(label: str, general:bool = True) -> tuple[str, str]:
+def rendering(label: str, general: bool = True) -> tuple[str, str]:
     """
     Controls how the information will be displayed in the view
     General = True: MAX_LENGTH = 21 for View
@@ -76,7 +71,7 @@ def bNumn(num: str) -> None:
 
         if not exists:
             newText = view + num
-        
+
         else:
             return
 
@@ -158,25 +153,35 @@ def bDeny():
     gui.buffer_view = buffer
 
 
+def validationOfSplit(bMinView: str, bView: str) -> bool:
+    if bMinView != "" and (bView != "0" and bView != ""):
+        return True
+    return False
+
+
 def bEqual():
     bView = gui.buffer_view
     bMinView = gui.buffer_min_view
-    if not(bView != "0" and bMinView[-1] == "/") and bMinView[-1] in "+-*/":
+    if bMinView[-1] in "+-*":
         if bMinView[-1] == "+":
             result = float(bMinView[:-1]) + float(bView)
         elif bMinView[-1] == "-":
             result = float(bMinView[:-1]) - float(bView)
         elif bMinView[-1] == "*":
             result = float(bMinView[:-1]) * float(bView)
-        elif bMinView[-1] == "/":
-            result = float(bMinView[:-1]) / float(bView)
 
-        result = round(result, 2)
-        if str(result)[-2:] == ".0":
-            result = str(result)[:-2]
-            result = int(result)
+    elif bMinView[-1] == "/" and validationOfSplit(bMinView[:-1], bView):
+        result = float(bMinView[:-1]) / float(bView)
 
-        updateViews(str(result))
+    else:
+        return
+
+    result = round(result, 2)
+    if str(result)[-2:] == ".0":
+        result = str(result)[:-2]
+        result = int(result)
+
+    updateViews(str(result))
 
 
 def bAdd():
@@ -188,12 +193,15 @@ def bAdd():
     for i in range(len(bMin_view)):
         if bMin_view[i] == "+":
             exists = True
-        
+
         # If there is another previous operation, it is first resolved and then the symbol of the operation is added
         elif i != 0 and bMin_view[i] in "-*/":
-            bEqual()
-            bMin_view = gui.buffer_min_view
-            bMin_view = bMin_view + "+"
+            if bView != "0" and bView != "":
+                bEqual()
+                bMin_view = gui.buffer_min_view
+                bMin_view = bMin_view + "+"
+            else:
+                bMin_view = bMin_view[:-1] + "+"
             updateMinView(bMin_view)
             return
 
@@ -218,7 +226,7 @@ def bAdd():
 
         result = round(result, 2)
         result = str(result) + "+"
-    
+
     else:
         bView = float(bView)
         try:
@@ -253,9 +261,12 @@ def bSubtact():
 
         # If there is another previous operation, it is first resolved and then the symbol of the operation is added
         elif bMin_view[i] in "+*/":
-            bEqual()
-            bMin_view = gui.buffer_min_view
-            bMin_view = bMin_view + "-"
+            if bView != "0" and bView != "":
+                bEqual()
+                bMin_view = gui.buffer_min_view
+                bMin_view = bMin_view + "-"
+            else:
+                bMin_view = bMin_view[:-1] + "-"
             updateMinView(bMin_view)
             return
 
@@ -280,7 +291,7 @@ def bSubtact():
 
         result = round(result, 2)
         result = str(result) + "-"
-    
+
     else:
         bView = float(bView)
         try:
@@ -308,13 +319,146 @@ def bSubtact():
 
 
 def bMultiply():
+    # get buffer of view and buffer of min_view
+    bView = gui.buffer_view
+    bMin_view = gui.buffer_min_view
 
-    return
+    exists = False
+    for i in range(len(bMin_view)):
+        if bMin_view[i] == "*":
+            exists = True
+
+        # If there is another previous operation, it is first resolved and then the symbol of the operation is added
+        elif i != 0 and bMin_view[i] in "+-/":
+            if bView != "0" and bView != "":
+                bEqual()
+                bMin_view = gui.buffer_min_view
+                bMin_view = bMin_view + "*"
+            else:
+                bMin_view = bMin_view[:-1] + "*"
+            updateMinView(bMin_view)
+            return
+
+    # If the min view already has the symbol, add it and put the symbol back, if not, just put the number and the operation
+    if exists:
+        if bView != "0" and bMin_view != "0":
+            bView = float(bView)
+            bMin_view = float(bMin_view[:-1])
+            result = bMin_view * bView
+
+        elif bView != "0" and bMin_view == "0":
+            bView = float(bView)
+            bMin_view = int(bMin_view)
+            result = bMin_view * bView
+
+        else:
+            # if you have not yet indicated a value, do nothing
+            return
+        if str(result)[-2:] == ".0":
+            result = str(result)[:-2]
+            result = int(result)
+
+        result = round(result, 2)
+        result = str(result) + "*"
+
+    else:
+        bView = float(bView)
+        try:
+            bMin_view = float(bMin_view)
+        except ValueError:
+            try:
+                bMin_view = int(bMin_view)
+            except ValueError:
+                bMin_view = int(bMin_view[:-1])
+        result = bMin_view + bView
+
+        if str(result)[-2:] == ".0":
+            result = str(result)[:-2]
+            result = int(result)
+
+        result = round(result, 2)
+        result = str(result) + "*"
+
+    # update views and buffers
+    updateViews(str(result))
 
 
 def bSplit():
+    # get buffer of view and buffer of min_view
+    bView = gui.buffer_view
+    bMin_view = gui.buffer_min_view
 
-    return
+    exists = False
+    for i in range(len(bMin_view)):
+        if bMin_view[i] == "/":
+            exists = True
+
+        # If there is another previous operation, it is first resolved and then the symbol of the operation is added
+        elif bMin_view[i] in "+-*":
+            if bView != "0" and bView != "":
+                bEqual()
+                bMin_view = gui.buffer_min_view
+                bMin_view = bMin_view + "/"
+            else:
+                bMin_view = bMin_view[:-1] + "/"
+            updateMinView(bMin_view)
+            return
+
+    # If the min view already has the symbol, subtract it and put the symbol back, if not, just put the number and the operation
+    if exists:
+        if bView != "0" and bMin_view != "0":
+            bView = float(bView)
+            bMin_view = float(bMin_view[:-1])
+            result = bMin_view / bView
+
+        elif bView != "0" and bMin_view == "0":
+            bView = float(bView)
+            bMin_view = int(bMin_view)
+            result = bMin_view / bView
+
+        else:
+            # if you have not yet indicated a value, do nothing
+            return
+        if str(result)[-2:] == ".0":
+            result = str(result)[:-2]
+            result = int(result)
+
+        result = round(result, 2)
+        result = str(result) + "/"
+
+    else:
+        bView = float(bView)
+        try:
+            bMin_view = float(bMin_view)
+        except ValueError:
+            try:
+                bMin_view = int(bMin_view)
+            except ValueError:
+                bMin_view = int(bMin_view[:-1])
+
+        if bMin_view != 0 and bView != 0:
+            # necessary condition to solve a division
+            result = bMin_view / bView
+        elif bView != 0:
+            result = bView
+        else:
+            # If the condition is not met, only the division symbol is added to the minimal view
+            if str(bMin_view)[-2:] == ".0":
+                bMin_view = str(bMin_view)[:-2] + "/"
+            else:
+                bMin_view = str(bMin_view) + "/"
+            updateMinView(bMin_view)
+            return
+
+        if str(result)[-2:] == ".0":
+            result = str(result)[:-2]
+            result = int(result)
+
+        result = round(result, 2)
+        result = str(result) + "/"
+
+    # update views and buffers
+    updateViews(str(result))
 
 
 def bClean():
@@ -329,7 +473,7 @@ def bClean():
 def bUndo():
     # removes the last element from the view tag
     gui.buffer_view = gui.buffer_view[:-1]
-    text:str = gui.view.cget("text")
+    text: str = gui.view.cget("text")
     gui.view.config(text=text[:-1])
 
 
